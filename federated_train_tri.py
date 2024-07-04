@@ -53,7 +53,7 @@ def main(total_epochs, evaluate, path, splits, t_round, wd, normalization, n_cli
          alphamix_global, alpha_cap, inverse, case_alpha, alpha_normalization, closed_form_approximation, alpha_opt,
          alpha_hyperparams, beta,
          nclients_div, multiloss, scale, multiloss_type, alpha_wd_factor, SoTA_comp, batch_size, classes_percentage,
-         n_poisoned_classes, n_poisoned_clients, datadir):
+         n_poisoned_classes, n_poisoned_clients,datadir):
 
     writer = SummaryWriter(log_dir='./' + save_path)
     print(splits)
@@ -88,7 +88,8 @@ def main(total_epochs, evaluate, path, splits, t_round, wd, normalization, n_cli
         clients_list=[i for i in range(n_clients)]
         classes_list = [i for i in range(n_classes)]
 
-        poisoned_clients = random.sample(clients_list, n_poisoned_clients)
+        #poisoned_clients = random.sample(clients_list, n_poisoned_clients)
+        poisoned_clients=[0]
         classes_t=random.sample(classes_list, 2*n_poisoned_classes)
         poisoned_classes=classes_t[0:len(classes_t)//2]
         modified_classes=classes_t[len(classes_t)//2:]
@@ -303,13 +304,13 @@ if __name__ == '__main__':
     argument_dict['scale'] = 1
     argument_dict['beta'] = 0.5
 
-    argument_dict['datadir'] = '../tiny-imagenet-200'
+    argument_dict['datadir']='../tiny-imagenet-200'
 
     ##new age##
     argument_dict['classes_percentage']=1
     #classes_percentage=[0.4,0.6,0.8,1,0.2]
-    argument_dict['number_of_poisoned_classes'] =0
-    argument_dict['number_of_poisoned_clients'] = 0
+    number_of_poisoned_classes=[1,3,10]
+    number_of_poisoned_clients=[1,2,3]
 
     argument_dict['alpha_hyperparams'] = [argument_dict['alpha_learning_rate'],
                                           argument_dict['alpha_learning_iters'],
@@ -317,31 +318,33 @@ if __name__ == '__main__':
                                           argument_dict['alpha_grads_div']]
 
 
+    for i in range(len(number_of_poisoned_classes)):
+        for k in range(len(number_of_poisoned_clients)):
 
+            argument_dict['number_of_poisoned_classes'] = number_of_poisoned_classes[i]
+            argument_dict['number_of_poisoned_clients'] = number_of_poisoned_clients[k]
 
+            for j in range(iters):
+                splits = create_splits(argument_dict)
+                save_path = create_save_folder(argument_dict, path_s+str(1))
 
-
-    for j in range(iters):
-        splits = create_splits(argument_dict)
-        save_path = create_save_folder(argument_dict, path_s)
-
-        main(argument_dict['epochs'], False, argument_dict['path'], splits, argument_dict['t_round'],
-             argument_dict['wd_factor'], argument_dict['normalization']
-             , argument_dict['clients'], j, count, argument_dict['lr'], argument_dict['dataset'],
-             argument_dict['partition'], argument_dict['mod'],
-             argument_dict['depth'], argument_dict['mode'], argument_dict['coef_t'], argument_dict['coef_d'],
-             save_path,
-             argument_dict['common_dataset_size'], path_s,
-             argument_dict['alphamix_global'], argument_dict['alpha_cap'], argument_dict['inverse'],
-             argument_dict['case_alpha'],
-             argument_dict['alpha_normalization'], argument_dict['closed_form_approximation'],
-             argument_dict['alpha_opt'], argument_dict['alpha_hyperparams'],
-             argument_dict['beta'], argument_dict['nclients_div'],
-             argument_dict['multiloss'], argument_dict['scale'],
-             argument_dict['multiloss_type'], argument_dict['alpha_wd_factor'],
-             argument_dict['SoTA_comp'], argument_dict['batch_size'], argument_dict['classes_percentage'],
-             argument_dict['number_of_poisoned_classes'],  argument_dict['number_of_poisoned_clients'], argument_dict['datadir'])
-        count += 1
+                main(argument_dict['epochs'], False, argument_dict['path'], splits, argument_dict['t_round'],
+                     argument_dict['wd_factor'], argument_dict['normalization']
+                     , argument_dict['clients'], j, count, argument_dict['lr'], argument_dict['dataset'],
+                     argument_dict['partition'], argument_dict['mod'],
+                     argument_dict['depth'], argument_dict['mode'], argument_dict['coef_t'], argument_dict['coef_d'],
+                     save_path,
+                     argument_dict['common_dataset_size'], path_s,
+                     argument_dict['alphamix_global'], argument_dict['alpha_cap'], argument_dict['inverse'],
+                     argument_dict['case_alpha'],
+                     argument_dict['alpha_normalization'], argument_dict['closed_form_approximation'],
+                     argument_dict['alpha_opt'], argument_dict['alpha_hyperparams'],
+                     argument_dict['beta'], argument_dict['nclients_div'],
+                     argument_dict['multiloss'], argument_dict['scale'],
+                     argument_dict['multiloss_type'], argument_dict['alpha_wd_factor'],
+                     argument_dict['SoTA_comp'], argument_dict['batch_size'], argument_dict['classes_percentage'],
+                     argument_dict['number_of_poisoned_classes'],  argument_dict['number_of_poisoned_clients'], argument_dict['datadir'] )
+                count += 1
 
 
 

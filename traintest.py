@@ -62,7 +62,7 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
                               valid_loader_server, common_dataset_size,
                               path, alphamix_global, alpha_cap, inverse, case_alpha, alpha_normalization, closed_form_approximation, alpha_opt, alpha_hyperparams,
                               nclients_div, multiloss, scale, multiloss_type, alpha_wd_factor,
-                              SoTA_comp):
+                              SoTA_comp, poisoned_classes, modified_classes, poisoned_clients):
 
 
 
@@ -70,8 +70,6 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
 
     best_round=0
     best_prec=0
-    valid_loader_server_inc = 0
-    test_loader_inc=0
 
     if mode == 'traditional':
         valid_loader_server = valid_loader_list[-1]
@@ -127,7 +125,7 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
                              writer, save_path, t_round, lr_next, train_loader_list, valid_loader_list, total_epochs,
                              n_classes, mode, coef_t,coef_d, list_name, soft_logits, soft_logits_l, valid_loader_server,
                              common_dataset_size,  path, alphamix_global, multiloss, scale, multiloss_type,
-                             test_c_loss, test_c_prec, valid_loader_server_inc)
+                             test_c_loss, test_c_prec, poisoned_classes, modified_classes, poisoned_clients)
 
 
 
@@ -387,7 +385,7 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
                  writer, save_path, t_round, lr_next, train_loader_list, valid_loader_list, total_epochs, n_classes, mode, coef_t,coef_d,
                  list_name, soft_logits, soft_logits_l,  valid_loader_server, common_dataset_size,
                  path, alphamix_global, multiloss, scale, multiloss_type,
-                 test_c_loss, test_c_prec, valid_loader_server_inc):
+                 test_c_loss, test_c_prec, poisoned_classes, modified_classes, poisoned_clients):
 
 
 
@@ -553,10 +551,9 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
         ###train
         train_loss, train_prec, output_avg, activation_avg, tot_output_avg = train(train_loader, epoch, model, optimizer, coef_t, soft_logits, last_epoch,
-          mode, common_dataset_size, round_n)
+          mode, common_dataset_size, round_n, client, poisoned_classes, modified_classes, poisoned_clients)
 
-        if valid_loader_server_inc!=0:
-            train_minimum(valid_loader_server_inc, epoch, model, optimizer)
+
 
 
 
@@ -1007,7 +1004,8 @@ def knowledge_distillation(output, soft_logits_ts,soft_logits_l_ts,multiloss, in
 
     return loss, loss_i
 
-def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode, common_dataset_size, round_n):
+def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode, common_dataset_size, round_n, client,
+          poisoned_classes, modified_classes, poisoned_clients):
 
 
     model.train()
@@ -1019,8 +1017,7 @@ def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode
 
 
 
-    kl_loss = nn.KLDivLoss(reduction="batchmean")
-    n = nn.LogSoftmax(dim=1)
+
     m = nn.Softmax(dim=1)
 
     if last_epoch and mode == 'distillation' :
@@ -1045,6 +1042,15 @@ def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode
         data, target = Variable(data), Variable(target)
         optimizer.zero_grad()
 
+        if client in poisoned_clients:
+            for i in range(len(target)):
+                if target[i] in poisoned_classes:
+                    pos=poisoned_classes.index(target[i])
+                    target[i]=modified_classes[pos]
+
+
+
+
         output, activation, _, _ = model(data)
 
 
@@ -1061,7 +1067,8 @@ def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode
 
             output=m(output)
 
-            activation_avg, output_avg, tot_output_avg = activations_calculation (output,activation,target,output_avg,activation_avg, tot_output_avg)
+            activation_avg, output_avg, tot_output_avg = activations_calculation (output,activation,target,output_avg,
+                                                                                  activation_avg, tot_output_avg)
 
 
 
@@ -1133,46 +1140,6 @@ def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode
     return loss.item(), float(train_acc) / float(len(train_loader.sampler)), output_avg, activation_avg, tot_output_avg
 
 
-def train_minimum(train_loader, epoch, model, optimizer):
-    model.train()
-    train_acc = 0.
-    data_sum = 0
-
-
-
-
-
-    for batch_idx, (data, target, index) in enumerate(train_loader):
-
-
-
-        data, target = data.cuda(), target.cuda()
-        data, target = Variable(data), Variable(target)
-        optimizer.zero_grad()
-
-        output, _, _, _ = model(data)
-
-        loss = F.cross_entropy(output, target).cuda()
-
-
-        pred = output.data.max(1, keepdim=True)[1]
-        train_acc += pred.eq(target.data.view_as(pred)).cpu().sum()
-        loss.backward()
-        optimizer.step()
-        data_sum += data.size()[0]
-        del output
-
-        # print(float(batch_idx)+1e-12)
-        log_interval = 5
-        if (batch_idx + 1) % log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.1f}%)]\tLoss: {:.6f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
-                epoch, (batch_idx + 1) * len(data), len(train_loader.sampler),
-                       100. * batch_idx / len(train_loader), loss.item(), train_acc, data_sum,
-                       100. * float(train_acc) / (float(data_sum))))
-
-
-
-    return loss.item(), float(train_acc) / float(len(train_loader.sampler))
 
 
 

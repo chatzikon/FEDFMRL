@@ -1,7 +1,53 @@
 import numpy as np
 import torch
+import random
+import torchvision.transforms as transforms
+from torchvision.datasets import ImageFolder, DatasetFolder
 
 
+class ImageFolder_custom(DatasetFolder):
+    def __init__(self, root, dataidxs=None, train=True, transform=None, target_transform=None):
+        self.root = root
+        self.dataidxs = dataidxs
+        self.train = train
+        self.transform = transform
+        self.target_transform = target_transform
+
+        imagefolder_obj = ImageFolder(self.root, self.transform, self.target_transform)
+        self.loader = imagefolder_obj.loader
+        if self.dataidxs is not None:
+            self.samples = np.array(imagefolder_obj.samples)[self.dataidxs]
+        else:
+            self.samples = np.array(imagefolder_obj.samples)
+
+    def __getitem__(self, index):
+        path = self.samples[index][0]
+        target = self.samples[index][1]
+        target = int(target)
+        sample = self.loader(path)
+        if self.transform is not None:
+            sample = self.transform(sample)
+        if self.target_transform is not None:
+            target = self.target_transform(target)
+
+        return sample, target, index
+
+    def __len__(self):
+        if self.dataidxs is None:
+            return len(self.samples)
+        else:
+            return len(self.dataidxs)
+
+
+def load_tinyimagenet_data(datadir):
+    transform = transforms.Compose([transforms.ToTensor()])
+    xray_train_ds = ImageFolder_custom(datadir+'/train/', transform=transform)
+    xray_test_ds = ImageFolder_custom(datadir+'/val/', transform=transform)
+
+    X_train, y_train = np.array([s[0] for s in xray_train_ds.samples]), np.array([int(s[1]) for s in xray_train_ds.samples])
+    X_test, y_test = np.array([s[0] for s in xray_test_ds.samples]), np.array([int(s[1]) for s in xray_test_ds.samples])
+
+    return (X_train, y_train, X_test, y_test)
 
 
 def record_net_data_stats(y_train, net_dataidx_map, classes):
@@ -22,7 +68,8 @@ def record_net_data_stats(y_train, net_dataidx_map, classes):
 
 
 
-def partition_data(y_train, partition, n_parties, classes, beta=0.4):
+def partition_data(y_train, partition, n_parties, classes, classes_percentage,
+                   beta=0.4):
 
     n_train = y_train.shape[0]
 
@@ -37,35 +84,69 @@ def partition_data(y_train, partition, n_parties, classes, beta=0.4):
     elif partition == "noniid":
         min_size = 0
         min_require_size = 10
-        K = 100
+
+        if classes_percentage<1:
+            no_class_client=[]
+            min_size = -1
+            min_require_size=0
+            no_class_clients=round((1-classes_percentage)*n_parties)
+            for i in range(no_class_clients):
+                no_class_client.append(i%n_parties)
+
+
+        K = len(classes)
+
 
 
         N = y_train.shape[0]
         net_dataidx_map = {}
 
         while min_size < min_require_size:
-            idx_batch = [[] for _ in range(n_parties)]
+            idx_batch = [[] for _ in range(round(n_parties))]
 
             for k in range(K):
+
+                if classes_percentage<1:
+                    idx_batch_class= [[] for _ in range(round(n_parties))]
+
                 idx_k = np.where(y_train == k)[0]
                 np.random.shuffle(idx_k)
-                proportions = np.random.dirichlet(np.repeat(beta, n_parties))
-                proportions = np.array([p * (len(idx_j) < N / n_parties) for p, idx_j in zip(proportions, idx_batch)])
+                #proportions = np.random.dirichlet(np.repeat(beta, n_parties))
+                #proportions = np.array([p * (len(idx_j) < N / n_parties) for p, idx_j in zip(proportions, idx_batch)])
+                proportions = np.random.dirichlet(np.repeat(beta, n_parties*classes_percentage))
+                proportions = np.array([p * (len(idx_j) < N / (n_parties*classes_percentage)) for p, idx_j in zip(proportions, idx_batch)])
+
                 proportions = proportions / proportions.sum()
                 proportions = (np.cumsum(proportions) * len(idx_k)).astype(int)[:-1]
-                idx_batch = [idx_j + idx.tolist() for idx_j, idx in zip(idx_batch, np.split(idx_k, proportions))]
-                min_size = min([len(idx_j) for idx_j in idx_batch])
+
+                if classes_percentage<1:
+                    idx_batch_class = [idx_j + idx.tolist() for idx_j, idx in zip(idx_batch_class, np.split(idx_k, proportions))]
+                    min_size = 0
+                    for i in range(len(no_class_client)):
+                        idx_batch_class.insert(no_class_client[i], [])
+                        no_class_client[i] = (no_class_client[-1] + i + 1) % n_parties
+                    for l in range(len(idx_batch)):
+                        idx_batch[l]+=idx_batch_class[l]
+                else:
+                    idx_batch = [idx_j + idx.tolist() for idx_j, idx in zip(idx_batch, np.split(idx_k, proportions))]
+                    min_size = min([len(idx_j) for idx_j in idx_batch])
+
+
+
 
         for j in range(n_parties):
             np.random.shuffle(idx_batch[j])
             net_dataidx_map[j] = idx_batch[j]
-
+    ss=0
+    for i in range(len(net_dataidx_map)):
+        ss+=len(net_dataidx_map[i])
     traindata_cls_counts = record_net_data_stats(y_train, net_dataidx_map, classes)
     return ( net_dataidx_map, traindata_cls_counts)
 
 
 
-def client_subset_creation(partition,trainSet,splits,n_clients,beta, batch_size, mode, common_dataset_size):
+def client_subset_creation(partition,trainSet,splits,n_clients,beta, batch_size, mode, common_dataset_size, classes_percentage,
+                           dataset, datadir):
 
 
     if mode == 'distillation':
@@ -89,7 +170,8 @@ def client_subset_creation(partition,trainSet,splits,n_clients,beta, batch_size,
 
     else:
 
-        train_set, valid_set, valid_dataset_server = noniid_split(total_len, mode, trainSet, list_server, n_clients, partition, beta)
+        train_set, valid_set, valid_dataset_server = noniid_split(total_len, mode, trainSet, list_server, n_clients, partition, beta,
+                                                                  classes_percentage)
 
 
 
@@ -97,8 +179,10 @@ def client_subset_creation(partition,trainSet,splits,n_clients,beta, batch_size,
                                                                                   valid_dataset_server)
 
 
-
-    X_train, y_train = trainSet.data, np.array(trainSet.targets)
+    if dataset=='tinyimagenet':
+        X_train, y_train, _, _ = load_tinyimagenet_data(datadir)
+    else:
+        X_train, y_train = trainSet.data, np.array(trainSet.targets)
 
 
 
@@ -233,7 +317,7 @@ def random_split(n_clients, trainSet, splits, total_len, mode, list_server):
 
 
 
-def noniid_split(total_len, mode, trainSet, list_server, n_clients, partition, beta ):
+def noniid_split(total_len, mode, trainSet, list_server, n_clients, partition, beta, classes_percentage):
 
     total_len = [total_len]
 
@@ -279,8 +363,11 @@ def noniid_split(total_len, mode, trainSet, list_server, n_clients, partition, b
     temp = np.array(trainSet.targets)
     y_train = temp[np.array(temp_dataset.indices)]
 
-    classes=trainSet.classes
-    net_dataidx_map_init, traindata_cls_counts = partition_data(y_train, partition, n_clients, classes, beta=beta)
+    #classes=random.sample(trainSet.classes,int(classes_percentage*len(trainSet.classes)))
+    classes = trainSet.classes
+
+    net_dataidx_map_init, traindata_cls_counts = partition_data(y_train, partition, n_clients, classes, classes_percentage,
+                                                                beta=beta)
 
     net_dataidx_map = {}
 
