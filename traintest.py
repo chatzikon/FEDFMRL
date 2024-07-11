@@ -18,6 +18,9 @@ from exemplar import *
 from torchvision import transforms
 import random
 import copy
+from resnet_cifar_moon import *
+
+
 
 def create_layer_optimizers(model,lr, momentum, weight_decay):
 
@@ -62,7 +65,7 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
                               valid_loader_server, common_dataset_size,
                               path, alphamix_global, alpha_cap, inverse, case_alpha, alpha_normalization, closed_form_approximation, alpha_opt, alpha_hyperparams,
                               nclients_div, multiloss, scale, multiloss_type, alpha_wd_factor,
-                              SoTA_comp, poisoned_classes, modified_classes, poisoned_clients):
+                              SoTA_comp, poisoned_classes, modified_classes, poisoned_clients, dataset):
 
 
 
@@ -125,7 +128,7 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
                              writer, save_path, t_round, lr_next, train_loader_list, valid_loader_list, total_epochs,
                              n_classes, mode, coef_t,coef_d, list_name, soft_logits, soft_logits_l, valid_loader_server,
                              common_dataset_size,  path, alphamix_global, multiloss, scale, multiloss_type,
-                             test_c_loss, test_c_prec, poisoned_classes, modified_classes, poisoned_clients)
+                             test_c_loss, test_c_prec, poisoned_classes, modified_classes, poisoned_clients, dataset)
 
 
 
@@ -143,8 +146,10 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
                 model = vgg(normalization, n_classes, depth=depth)
 
             elif mod == 'resnet':
-
-                model = resnet(n_classes=n_classes, depth=depth)
+                if dataset=='tinyimagenet':
+                    model = ResNet50_cifar10()
+                else:
+                    model = resnet(n_classes=n_classes, depth=depth)
 
 
             model.cuda()
@@ -385,7 +390,7 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
                  writer, save_path, t_round, lr_next, train_loader_list, valid_loader_list, total_epochs, n_classes, mode, coef_t,coef_d,
                  list_name, soft_logits, soft_logits_l,  valid_loader_server, common_dataset_size,
                  path, alphamix_global, multiloss, scale, multiloss_type,
-                 test_c_loss, test_c_prec, poisoned_classes, modified_classes, poisoned_clients):
+                 test_c_loss, test_c_prec, poisoned_classes, modified_classes, poisoned_clients, dataset):
 
 
 
@@ -402,7 +407,11 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
     elif mod == 'resnet':
 
 
-        model= resnet(n_classes=n_classes, depth=depth)
+
+        if dataset=='tinyimagenet':
+            model = ResNet50_cifar10()
+        else:
+            model= resnet(n_classes=n_classes, depth=depth)
 
 
 
@@ -688,7 +697,7 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
         per_client_tot_output_avg, list_name,epoch,  writer, test_c_loss, test_c_prec
 
 
-def evaluate(test_loader, path, mod, normalization,n_classes,depth, alpha_opt, SoTA_comp):
+def evaluate(test_loader, path, mod, normalization,n_classes,depth, alpha_opt, SoTA_comp, dataset):
 
     if mod == 'vgg':
         model = vgg(normalization, n_classes, depth=depth)
@@ -697,7 +706,10 @@ def evaluate(test_loader, path, mod, normalization,n_classes,depth, alpha_opt, S
         if depth==11:
             model = ResNet11(n_classes)
         else:
-            model = resnet(n_classes=n_classes, depth=depth)
+            if dataset=='tinyimagenet':
+                model = ResNet50_cifar10()
+            else:
+                model = resnet(n_classes=n_classes, depth=depth)
 
     model.eval()
 
