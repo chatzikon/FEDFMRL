@@ -71,6 +71,9 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
 
 
 
+
+
+
     best_round=0
     best_prec=0
 
@@ -147,7 +150,8 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
 
             elif mod == 'resnet':
                 if dataset=='tinyimagenet':
-                    model = ResNet50_cifar10()
+                    model = torchvision.models.resnet50(pretrained=True)
+                    model.fc = nn.Linear(model.fc.in_features, n_classes)
                 else:
                     model = resnet(n_classes=n_classes, depth=depth)
 
@@ -409,7 +413,8 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
 
         if dataset=='tinyimagenet':
-            model = ResNet50_cifar10()
+            model = torchvision.models.resnet50(pretrained=True)
+            model.fc = nn.Linear(model.fc.in_features, n_classes)
         else:
             model= resnet(n_classes=n_classes, depth=depth)
 
@@ -560,7 +565,7 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
         ###train
         train_loss, train_prec, output_avg, activation_avg, tot_output_avg = train(train_loader, epoch, model, optimizer, coef_t, soft_logits, last_epoch,
-          mode, common_dataset_size, round_n, client, poisoned_classes, modified_classes, poisoned_clients)
+          mode, common_dataset_size, round_n, client, poisoned_classes, modified_classes, poisoned_clients, n_classes)
 
 
 
@@ -707,7 +712,8 @@ def evaluate(test_loader, path, mod, normalization,n_classes,depth, alpha_opt, S
             model = ResNet11(n_classes)
         else:
             if dataset=='tinyimagenet':
-                model = ResNet50_cifar10()
+                model = torchvision.models.resnet50(pretrained=True)
+                model.fc = nn.Linear(model.fc.in_features, n_classes)
             else:
                 model = resnet(n_classes=n_classes, depth=depth)
 
@@ -1017,7 +1023,7 @@ def knowledge_distillation(output, soft_logits_ts,soft_logits_l_ts,multiloss, in
     return loss, loss_i
 
 def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode, common_dataset_size, round_n, client,
-          poisoned_classes, modified_classes, poisoned_clients):
+          poisoned_classes, modified_classes, poisoned_clients, n_classes):
 
 
     model.train()
@@ -1039,11 +1045,16 @@ def train(train_loader, epoch, model, optimizer,coef,soft_logits,last_epoch,mode
         tot_output_avg = []
         activation_avg = []
 
-
-        for i in range(len(train_loader.dataset.dataset.classes)):
-            output_avg.append([])
-            tot_output_avg.append([])
-            activation_avg.append([])
+        if n_classes==200:
+            for i in range(n_classes):
+                output_avg.append([])
+                tot_output_avg.append([])
+                activation_avg.append([])
+        else:
+            for i in range(len(train_loader.dataset.dataset.classes)):
+                output_avg.append([])
+                tot_output_avg.append([])
+                activation_avg.append([])
 
     #common = set(train_loader.batch_sampler.sampler.indices) & set(train_loader.dataset.indices)
     for batch_idx, (data, target, index) in enumerate(train_loader):

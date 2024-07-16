@@ -78,10 +78,8 @@ def learn_alpha(model, org_embed,  labels, anchor_embed, alpha,  alpha_learning_
 
             optimizer.zero_grad()
 
-            if SoTA_comp == False:
-                out = model(data)
-            else:
-                out,activation, out_l1, out_l2=model(data)
+
+            out,activation, out_l1, out_l2=model(data)
 
 
 
