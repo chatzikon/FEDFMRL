@@ -183,7 +183,8 @@ def main(total_epochs, evaluate, path, splits, t_round, wd, normalization, n_cli
                 model = ResNet11(n_classes)
             else:
                 if dataset=='tinyimagenet':
-                    model=ResNet50_cifar10()
+                    model = torchvision.models.resnet50(pretrained=True)
+                    model.fc = nn.Linear(model.fc.in_features, n_classes)
                 else:
                     model = resnet(n_classes=n_classes, depth=depth)
 
@@ -260,9 +261,9 @@ if __name__ == '__main__':
     argument_dict = {}
 
     argument_dict['path'] = ''
-    argument_dict['wd_factor'] = 1e-3
+    argument_dict['wd_factor'] = 1e-5
     argument_dict['normalization'] = 'normal'
-    argument_dict['lr'] = 0.1
+    argument_dict['lr'] = 0.01
     argument_dict['mod'] = 'resnet'
 
     count = 0
@@ -275,25 +276,17 @@ if __name__ == '__main__':
 
     argument_dict['depth'] = 56
 
+    argument_dict['batch_size'] = 512
+
     argument_dict['clients'] = 10
+    argument_dict['t_round'] = 1
+    argument_dict['epochs'] = 3
 
-    argument_dict['t_round'] = 50
-
-    argument_dict['batch_size'] = 64
-    argument_dict['epochs'] = 300
-
-
-
-
-
-
-
-
-    # ###fld_alphamix
+    # ###fld_alphamix0
 
     argument_dict['alpha_cap'] = 0.8
 
-    argument_dict['dataset'] = 'cifar100'
+    argument_dict['dataset'] = 'tinyimagenet'
     argument_dict['mode'] = 'distillation'
     argument_dict['coef_t'] = 0
     argument_dict['coef_d'] = 1
@@ -324,8 +317,8 @@ if __name__ == '__main__':
     ##new age##
     argument_dict['classes_percentage'] = 1
     # classes_percentage=[0.4,0.6,0.8,1,0.2]
-    number_of_poisoned_classes = [50]
-    number_of_poisoned_clients = [6, 7]
+    number_of_poisoned_classes = [0]
+    number_of_poisoned_clients = [0]
 
     argument_dict['alpha_hyperparams'] = [argument_dict['alpha_learning_rate'],
                                           argument_dict['alpha_learning_iters'],
@@ -360,7 +353,6 @@ if __name__ == '__main__':
                      argument_dict['number_of_poisoned_classes'], argument_dict['number_of_poisoned_clients'],
                      argument_dict['datadir'])
                 count += 1
-
 
 
 

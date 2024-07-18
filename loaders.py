@@ -70,8 +70,9 @@ def loader_build(dataset,datadir,mode, partition,splits,n_clients,beta,batch_siz
         ])
 
         trainSet= dl_obj(datadir + '/train/', transform=transform_train)
-        trainSet_val=dl_obj(datadir + '/val/', transform=transform_test)
-        testSet = dl_obj(datadir + '/test/', transform=transform_test)
+        trainSet_val=dl_obj(datadir + '/train/', transform=transform_test)
+        #testSet = dl_obj(datadir + '/test/', transform=transform_test)
+        testSet = dl_obj(datadir + '/val/', transform=transform_test)
 
 
     if dataset=='cifar10':
@@ -85,10 +86,11 @@ def loader_build(dataset,datadir,mode, partition,splits,n_clients,beta,batch_siz
     test_loader = torch.utils.data.DataLoader(testSet)
 
 
+
     if mode == 'distillation':
 
 
-            train_loader_list, valid_loader_list, y_train, _, train_set, valid_set, valid_dataset_server = \
+            train_loader_list, valid_loader_list, _, _, train_set, valid_set, valid_dataset_server = \
                 client_subset_creation(partition, trainSet, splits, n_clients , beta, batch_size, mode, common_dataset_size,
                                        classes_percentage, dataset, datadir)
 
@@ -98,12 +100,12 @@ def loader_build(dataset,datadir,mode, partition,splits,n_clients,beta,batch_siz
 
     elif mode=='traditional':
 
-            train_loader_list, valid_loader_list, y_train, _, train_set, valid_set, valid_dataset_server = \
-                client_subset_creation(partition,trainSet_val,splits,n_clients,beta, batch_size, mode, common_dataset_size,
+            train_loader_list, valid_loader_list, _, _, train_set, valid_set, valid_dataset_server = \
+                client_subset_creation(partition,trainSet,splits,n_clients,beta, batch_size, mode, common_dataset_size,
                                        classes_percentage, dataset, datadir)
 
             _, _, _, valid_loader_server, _, _, _ = \
-                client_subset_creation(partition, trainSet, splits, n_clients , beta, batch_size, mode, common_dataset_size,
+                client_subset_creation(partition, trainSet_val, splits, n_clients , beta, batch_size, mode, common_dataset_size,
                                        classes_percentage, dataset, datadir)
 
 

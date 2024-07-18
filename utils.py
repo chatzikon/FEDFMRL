@@ -55,9 +55,12 @@ def learn_alpha(model, org_embed,  labels, anchor_embed, alpha,  alpha_learning_
 
 
 
-
-        output_base = torch.zeros(50000, n_classes, dtype=torch.float64)
-        target_base = torch.zeros(50000, n_classes, dtype=torch.int64)
+        if n_classes>100:
+            output_base = torch.zeros(100000, n_classes, dtype=torch.float64)
+            target_base = torch.zeros(100000, n_classes, dtype=torch.int64)
+        else:
+            output_base = torch.zeros(50000, n_classes, dtype=torch.float64)
+            target_base = torch.zeros(50000, n_classes, dtype=torch.int64)
         output = torch.zeros(len(valid_loader_server.dataset.indices), n_classes)
         target_ar = torch.zeros(len(valid_loader_server.dataset.indices), dtype=torch.int64)
 
@@ -180,7 +183,12 @@ def learn_alpha(model, org_embed,  labels, anchor_embed, alpha,  alpha_learning_
 
     count = 0
 
-    for i in range(50000):
+    if n_classes>100:
+        lim=100000
+    else:
+        lim=50000
+
+    for i in range(lim):
         if inds[count] == i:
 
 

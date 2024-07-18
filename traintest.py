@@ -542,10 +542,10 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
     for epoch in range(epoch_init, epoch_init + t_round):
 
-
-        if epoch in [int(total_epochs * 0.5), int(total_epochs * 0.75)]:
-            for param_group in optimizer.param_groups:
-                param_group['lr'] *= 0.1
+        if dataset!='tinyimagenet':
+            if epoch in [int(total_epochs * 0.5), int(total_epochs * 0.75)]:
+                for param_group in optimizer.param_groups:
+                    param_group['lr'] *= 0.1
 
         print('LR')
         print(optimizer.param_groups[0]['lr'])
@@ -586,8 +586,10 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
             if common_dataset_size>0 and mode=='distillation' :
 
-
-                output_base = np.zeros((50000, n_classes))
+                if dataset=='tinyimagenet':
+                    output_base = np.zeros((100000, n_classes))
+                else:
+                    output_base = np.zeros((50000, n_classes))
 
 
 
@@ -599,9 +601,12 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
                 if alphamix_global:
 
-
-                    grads_base = np.zeros((50000, n_classes))
-                    target_base=np.zeros((50000, n_classes))
+                    if dataset == 'tinyimagenet':
+                        grads_base = np.zeros((100000, n_classes))
+                        target_base=np.zeros((100000, n_classes))
+                    else:
+                        grads_base = np.zeros((50000, n_classes))
+                        target_base = np.zeros((50000, n_classes))
 
                 else:
 
@@ -1175,10 +1180,8 @@ def test(model, test_loader, alpha_opt, SoTA_comp):
         for data, target, index in test_loader:
             data, target = data.cuda(), target.cuda()
             data, target = Variable(data), Variable(target)
-            if alpha_opt and SoTA_comp==False:
-                 output = model(data)
-            else:
-                output, activation, _, _ = model(data)
+
+            output, activation, _, _ = model(data)
             loss = F.cross_entropy(output, target)
             test_loss.add(loss.item())  # sum up batch loss
             pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
