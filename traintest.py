@@ -149,10 +149,10 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
                 model = vgg(normalization, n_classes, depth=depth)
 
             elif mod == 'resnet':
-                if dataset=='tinyimagenet':
-                    model = torchvision.models.resnet50(pretrained=True)
-                    model.fc = nn.Linear(model.fc.in_features, n_classes)
-                else:
+                # if dataset=='tinyimagenet':
+                #     model = torchvision.models.resnet50(pretrained=True)
+                #     model.fc = nn.Linear(model.fc.in_features, n_classes)
+                # else:
                     model = resnet(n_classes=n_classes, depth=depth)
 
 
@@ -412,11 +412,11 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
 
 
-        if dataset=='tinyimagenet':
-            model = torchvision.models.resnet50(pretrained=True)
-            model.fc = nn.Linear(model.fc.in_features, n_classes)
-        else:
-            model= resnet(n_classes=n_classes, depth=depth)
+        # if dataset=='tinyimagenet':
+        #     model = torchvision.models.resnet50(pretrained=True)
+        #     model.fc = nn.Linear(model.fc.in_features, n_classes)
+        # else:
+        model= resnet(n_classes=n_classes, depth=depth)
 
 
 
@@ -542,10 +542,9 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
 
     for epoch in range(epoch_init, epoch_init + t_round):
 
-        if dataset!='tinyimagenet':
-            if epoch in [int(total_epochs * 0.5), int(total_epochs * 0.75)]:
-                for param_group in optimizer.param_groups:
-                    param_group['lr'] *= 0.1
+        if epoch in [int(total_epochs * 0.5), int(total_epochs * 0.75)]:
+            for param_group in optimizer.param_groups:
+                param_group['lr'] *= 0.1
 
         print('LR')
         print(optimizer.param_groups[0]['lr'])
@@ -716,10 +715,10 @@ def evaluate(test_loader, path, mod, normalization,n_classes,depth, alpha_opt, S
         if depth==11:
             model = ResNet11(n_classes)
         else:
-            if dataset=='tinyimagenet':
-                model = torchvision.models.resnet50(pretrained=True)
-                model.fc = nn.Linear(model.fc.in_features, n_classes)
-            else:
+            # if dataset=='tinyimagenet':
+            #     model = torchvision.models.resnet50(pretrained=True)
+            #     model.fc = nn.Linear(model.fc.in_features, n_classes)
+            # else:
                 model = resnet(n_classes=n_classes, depth=depth)
 
     model.eval()
