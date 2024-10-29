@@ -288,243 +288,16 @@ if __name__ == '__main__':
 
 
 
-    # ###fld_alphamix0
-
-    # argument_dict['alpha_cap'] = 0.8
-    #
-    # argument_dict['dataset'] = 'tinyimagenet'
-    # argument_dict['mode'] = 'distillation'
-    # argument_dict['coef_t'] = 0
-    # argument_dict['coef_d'] = 1
-    #
-    # argument_dict['alphamix_global'] = True
-    # argument_dict['alpha_normalization'] = 'none'
-    # argument_dict['case_alpha'] = 'b'
-    # argument_dict['inverse'] = 'mix1'
-    # argument_dict['closed_form_approximation'] = False
-    # argument_dict['alpha_opt'] = True
-    # argument_dict['alpha_learning_iters'] = 5
-    # argument_dict['alpha_grads_div'] = 1
-    # argument_dict['alpha_learning_rate'] = 1e-4
-    # argument_dict['alpha_clf_coef'] = 1
-    # argument_dict['alpha_l2_coef'] = 0.01
-    # argument_dict['alpha_grads_div'] = 20
-    # argument_dict['alpha_wd_factor'] = 1e-5
-    # argument_dict['nclients_div'] = False
-    # argument_dict['SoTA_comp'] = False
-    #
-    # argument_dict['multiloss'] = True
-    # argument_dict['multiloss_type'] = 'b'
-    # argument_dict['scale'] = 1
-    # argument_dict['beta'] = 0.5
-    #
-    # argument_dict['datadir'] = '../tiny-imagenet-200'
-    #
-    # ##new age##
-    # argument_dict['classes_percentage'] = 1
-    # # classes_percentage=[0.4,0.6,0.8,1,0.2]
-    # number_of_poisoned_classes = [0]
-    # number_of_poisoned_clients = [0]
-    #
-    # argument_dict['alpha_hyperparams'] = [argument_dict['alpha_learning_rate'],
-    #                                       argument_dict['alpha_learning_iters'],
-    #                                       argument_dict['alpha_clf_coef'], argument_dict['alpha_l2_coef'],
-    #                                       argument_dict['alpha_grads_div']]
-    #
-    # for i in range(len(number_of_poisoned_classes)):
-    #     for k in range(len(number_of_poisoned_clients)):
-    #
-    #         argument_dict['number_of_poisoned_classes'] = number_of_poisoned_classes[i]
-    #         argument_dict['number_of_poisoned_clients'] = number_of_poisoned_clients[k]
-    #
-    #         for j in range(iters):
-    #             splits = create_splits(argument_dict)
-    #             save_path = create_save_folder(argument_dict, path_s)
-    #
-    #             main(argument_dict['epochs'], False, argument_dict['path'], splits, argument_dict['t_round'],
-    #                  argument_dict['wd_factor'], argument_dict['normalization']
-    #                  , argument_dict['clients'], j, count, argument_dict['lr'], argument_dict['dataset'],
-    #                  argument_dict['partition'], argument_dict['mod'],
-    #                  argument_dict['depth'], argument_dict['mode'], argument_dict['coef_t'], argument_dict['coef_d'],
-    #                  save_path,
-    #                  argument_dict['common_dataset_size'], path_s,
-    #                  argument_dict['alphamix_global'], argument_dict['alpha_cap'], argument_dict['inverse'],
-    #                  argument_dict['case_alpha'],
-    #                  argument_dict['alpha_normalization'], argument_dict['closed_form_approximation'],
-    #                  argument_dict['alpha_opt'], argument_dict['alpha_hyperparams'],
-    #                  argument_dict['beta'], argument_dict['nclients_div'],
-    #                  argument_dict['multiloss'], argument_dict['scale'],
-    #                  argument_dict['multiloss_type'], argument_dict['alpha_wd_factor'],
-    #                  argument_dict['SoTA_comp'], argument_dict['batch_size'], argument_dict['classes_percentage'],
-    #                  argument_dict['number_of_poisoned_classes'], argument_dict['number_of_poisoned_clients'],
-    #                  argument_dict['datadir'])
-    #             count += 1
-
-
-
-
-    # # ###fld_alphamix_isolated
-    #
-    # argument_dict['alpha_cap'] = 0.8
-    #
-    # argument_dict['dataset'] = 'tinyimagenet'
-    # argument_dict['mode'] = 'distillation'
-    # argument_dict['coef_t'] = 0
-    # argument_dict['coef_d'] = 0
-    #
-    # argument_dict['alphamix_global'] = False
-    # argument_dict['alpha_normalization'] = 'none'
-    # argument_dict['case_alpha'] = 'b'
-    # argument_dict['inverse'] = 'mix1'
-    # argument_dict['closed_form_approximation'] = False
-    # argument_dict['alpha_opt'] = True
-    # argument_dict['alpha_learning_iters'] = 5
-    # argument_dict['alpha_grads_div'] = 1
-    # argument_dict['alpha_learning_rate'] = 1e-4
-    # argument_dict['alpha_clf_coef'] = 1
-    # argument_dict['alpha_l2_coef'] = 0.01
-    # argument_dict['alpha_grads_div'] = 20
-    # argument_dict['alpha_wd_factor'] = 1e-5
-    # argument_dict['nclients_div'] = False
-    # argument_dict['SoTA_comp'] = False
-    #
-    # argument_dict['multiloss'] = False
-    # argument_dict['multiloss_type'] = 'b'
-    # argument_dict['scale'] = 1
-    # argument_dict['beta'] = 0.5
-    #
-    # argument_dict['datadir'] = '../tiny-imagenet-200'
-    #
-    # ##new age##
-    # argument_dict['classes_percentage'] = 1
-    # # classes_percentage=[0.4,0.6,0.8,1,0.2]
-    # number_of_poisoned_classes = [0]
-    # number_of_poisoned_clients = [0]
-    #
-    # argument_dict['alpha_hyperparams'] = [argument_dict['alpha_learning_rate'],
-    #                                       argument_dict['alpha_learning_iters'],
-    #                                       argument_dict['alpha_clf_coef'], argument_dict['alpha_l2_coef'],
-    #                                       argument_dict['alpha_grads_div']]
-    #
-    # for i in range(len(number_of_poisoned_classes)):
-    #     for k in range(len(number_of_poisoned_clients)):
-    #
-    #         argument_dict['number_of_poisoned_classes'] = number_of_poisoned_classes[i]
-    #         argument_dict['number_of_poisoned_clients'] = number_of_poisoned_clients[k]
-    #
-    #         for j in range(iters):
-    #             splits = create_splits(argument_dict)
-    #             save_path = create_save_folder(argument_dict, path_s)
-    #
-    #             main(argument_dict['epochs'], False, argument_dict['path'], splits, argument_dict['t_round'],
-    #                  argument_dict['wd_factor'], argument_dict['normalization']
-    #                  , argument_dict['clients'], j, count, argument_dict['lr'], argument_dict['dataset'],
-    #                  argument_dict['partition'], argument_dict['mod'],
-    #                  argument_dict['depth'], argument_dict['mode'], argument_dict['coef_t'],
-    #                  argument_dict['coef_d'],
-    #                  save_path,
-    #                  argument_dict['common_dataset_size'], path_s,
-    #                  argument_dict['alphamix_global'], argument_dict['alpha_cap'], argument_dict['inverse'],
-    #                  argument_dict['case_alpha'],
-    #                  argument_dict['alpha_normalization'], argument_dict['closed_form_approximation'],
-    #                  argument_dict['alpha_opt'], argument_dict['alpha_hyperparams'],
-    #                  argument_dict['beta'], argument_dict['nclients_div'],
-    #                  argument_dict['multiloss'], argument_dict['scale'],
-    #                  argument_dict['multiloss_type'], argument_dict['alpha_wd_factor'],
-    #                  argument_dict['SoTA_comp'], argument_dict['batch_size'], argument_dict['classes_percentage'],
-    #                  argument_dict['number_of_poisoned_classes'], argument_dict['number_of_poisoned_clients'],
-    #                  argument_dict['datadir'])
-    #             count += 1
-
-
-
-
-
-    # ###fld_trad
-
-    # argument_dict['alpha_cap'] = 0.8
-    #
-    # argument_dict['dataset'] = 'tinyimagenet'
-    # argument_dict['mode'] = 'distillation'
-    # argument_dict['coef_t'] = 0
-    # argument_dict['coef_d'] = 1
-    #
-    # argument_dict['alphamix_global'] = False
-    # argument_dict['alpha_normalization'] = 'none'
-    # argument_dict['case_alpha'] = 'b'
-    # argument_dict['inverse'] = 'mix1'
-    # argument_dict['closed_form_approximation'] = False
-    # argument_dict['alpha_opt'] = True
-    # argument_dict['alpha_learning_iters'] = 5
-    # argument_dict['alpha_grads_div'] = 1
-    # argument_dict['alpha_learning_rate'] = 1e-4
-    # argument_dict['alpha_clf_coef'] = 1
-    # argument_dict['alpha_l2_coef'] = 0.01
-    # argument_dict['alpha_grads_div'] = 20
-    # argument_dict['alpha_wd_factor'] = 1e-5
-    # argument_dict['nclients_div'] = False
-    # argument_dict['SoTA_comp'] = False
-    #
-    # argument_dict['multiloss'] = False
-    # argument_dict['multiloss_type'] = 'b'
-    # argument_dict['scale'] = 1
-    # argument_dict['beta'] = 0.5
-    #
-    # argument_dict['datadir'] = '../tiny-imagenet-200'
-    #
-    # ##new age##
-    # argument_dict['classes_percentage'] = 1
-    # # classes_percentage=[0.4,0.6,0.8,1,0.2]
-    # number_of_poisoned_classes = [0]
-    # number_of_poisoned_clients = [0]
-    #
-    # argument_dict['alpha_hyperparams'] = [argument_dict['alpha_learning_rate'],
-    #                                       argument_dict['alpha_learning_iters'],
-    #                                       argument_dict['alpha_clf_coef'], argument_dict['alpha_l2_coef'],
-    #                                       argument_dict['alpha_grads_div']]
-    #
-    # for i in range(len(number_of_poisoned_classes)):
-    #     for k in range(len(number_of_poisoned_clients)):
-    #
-    #         argument_dict['number_of_poisoned_classes'] = number_of_poisoned_classes[i]
-    #         argument_dict['number_of_poisoned_clients'] = number_of_poisoned_clients[k]
-    #
-    #         for j in range(iters):
-    #             splits = create_splits(argument_dict)
-    #             save_path = create_save_folder(argument_dict, path_s)
-    #
-    #             main(argument_dict['epochs'], False, argument_dict['path'], splits, argument_dict['t_round'],
-    #                  argument_dict['wd_factor'], argument_dict['normalization']
-    #                  , argument_dict['clients'], j, count, argument_dict['lr'], argument_dict['dataset'],
-    #                  argument_dict['partition'], argument_dict['mod'],
-    #                  argument_dict['depth'], argument_dict['mode'], argument_dict['coef_t'],
-    #                  argument_dict['coef_d'],
-    #                  save_path,
-    #                  argument_dict['common_dataset_size'], path_s,
-    #                  argument_dict['alphamix_global'], argument_dict['alpha_cap'], argument_dict['inverse'],
-    #                  argument_dict['case_alpha'],
-    #                  argument_dict['alpha_normalization'], argument_dict['closed_form_approximation'],
-    #                  argument_dict['alpha_opt'], argument_dict['alpha_hyperparams'],
-    #                  argument_dict['beta'], argument_dict['nclients_div'],
-    #                  argument_dict['multiloss'], argument_dict['scale'],
-    #                  argument_dict['multiloss_type'], argument_dict['alpha_wd_factor'],
-    #                  argument_dict['SoTA_comp'], argument_dict['batch_size'], argument_dict['classes_percentage'],
-    #                  argument_dict['number_of_poisoned_classes'], argument_dict['number_of_poisoned_clients'],
-    #                  argument_dict['datadir'])
-    #             count += 1
-    #
-
-
-    # ###fl_trad
+    ###fld_alphamix0
 
     argument_dict['alpha_cap'] = 0.8
-
+    
     argument_dict['dataset'] = 'tinyimagenet'
-    argument_dict['mode'] = 'traditional'
+    argument_dict['mode'] = 'distillation'
     argument_dict['coef_t'] = 0
-    argument_dict['coef_d'] = 0
-
-    argument_dict['alphamix_global'] = False
+    argument_dict['coef_d'] = 1
+    
+    argument_dict['alphamix_global'] = True
     argument_dict['alpha_normalization'] = 'none'
     argument_dict['case_alpha'] = 'b'
     argument_dict['inverse'] = 'mix1'
@@ -539,39 +312,40 @@ if __name__ == '__main__':
     argument_dict['alpha_wd_factor'] = 1e-5
     argument_dict['nclients_div'] = False
     argument_dict['SoTA_comp'] = False
-
-    argument_dict['multiloss'] = False
+    
+    argument_dict['multiloss'] = True
     argument_dict['multiloss_type'] = 'b'
     argument_dict['scale'] = 1
     argument_dict['beta'] = 0.5
-
+    
     argument_dict['datadir'] = '../tiny-imagenet-200'
-
-    ##new age##
+    
+    # ##new age##
     argument_dict['classes_percentage'] = 1
     # classes_percentage=[0.4,0.6,0.8,1,0.2]
-    argument_dict['number_of_poisoned_classes']= 0
-    argument_dict['number_of_poisoned_clients'] = 0
-
+    number_of_poisoned_classes = [0]
+    number_of_poisoned_clients = [0]
+    
     argument_dict['alpha_hyperparams'] = [argument_dict['alpha_learning_rate'],
                                           argument_dict['alpha_learning_iters'],
                                           argument_dict['alpha_clf_coef'], argument_dict['alpha_l2_coef'],
                                           argument_dict['alpha_grads_div']]
-
-    for i in range(len(t_round)):
-
-            argument_dict['t_round'] = t_round[i]
-
+    
+    for i in range(len(number_of_poisoned_classes)):
+        for k in range(len(number_of_poisoned_clients)):
+    
+             argument_dict['number_of_poisoned_classes'] = number_of_poisoned_classes[i]
+             argument_dict['number_of_poisoned_clients'] = number_of_poisoned_clients[k]
+    
             for j in range(iters):
                 splits = create_splits(argument_dict)
                 save_path = create_save_folder(argument_dict, path_s)
-
+    
                 main(argument_dict['epochs'], False, argument_dict['path'], splits, argument_dict['t_round'],
                      argument_dict['wd_factor'], argument_dict['normalization']
                      , argument_dict['clients'], j, count, argument_dict['lr'], argument_dict['dataset'],
                      argument_dict['partition'], argument_dict['mod'],
-                     argument_dict['depth'], argument_dict['mode'], argument_dict['coef_t'],
-                     argument_dict['coef_d'],
+                     argument_dict['depth'], argument_dict['mode'], argument_dict['coef_t'], argument_dict['coef_d'],
                      save_path,
                      argument_dict['common_dataset_size'], path_s,
                      argument_dict['alphamix_global'], argument_dict['alpha_cap'], argument_dict['inverse'],
@@ -587,6 +361,9 @@ if __name__ == '__main__':
                 count += 1
 
 
+
+
+    
 
 
 
