@@ -15,11 +15,8 @@ Run pip install -r equirements.txt to install the required packages
 
 # **Train**
 
-Use federated_train.py for training a new model. The default parameters are about an experiment with IID data, mu=0.5, buffer_size=4
+Use federated_train.py for training a new model. The default parameters are about an experiment with IID data, on CIFAR10 dataset and with FEDFMRL method with multiloss.
 The majority of the functions required for training and testing are at the script traintest.py. 
-
-The arguments of the main function are explained at the file arguments.txt
-
 
 
 # **License**
