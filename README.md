@@ -10,7 +10,7 @@ Run pip install -r equirements.txt to install the required packages
 
 # **Proposed method**
 
-![model architecture image](https://github.com/chatzikon/FedRCIL/blob/main/images/FL_IL_scheme_iccv_generic_figure.png)
+![model architecture image](https://github.com/chatzikon/FEDFMRL/blob/main/Alphamix%20diagram.jpg)
 
 
 # **Train**
