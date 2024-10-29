@@ -222,7 +222,7 @@ def main(total_epochs, evaluate, path, splits, t_round, wd, normalization, n_cli
             else:
                 model_srv_alpha = resnet(n_classes=n_classes, depth=depth)
         else:
-            model_srv_alpha = torchvision.models.resnet50(pretrained=True, progress=True)
+            model_srv_alpha = torchvision.models.resnet50(pretrained=False, progress=True)
             model_srv_alpha.fc = torch.nn.Linear(model_srv_alpha.fc.in_features, n_classes)
 
         model_srv_alpha.cuda()
@@ -276,10 +276,10 @@ if __name__ == '__main__':
 
     argument_dict['depth'] = 56
 
-    argument_dict['batch_size'] = 512
+    argument_dict['batch_size'] = 64
 
     argument_dict['clients'] = 10
-    t_round= [50,10,30,15]
+     argument_dict[t_round]= 50
     argument_dict['epochs'] = 300
 
 
@@ -290,9 +290,9 @@ if __name__ == '__main__':
 
     ###fld_alphamix0
 
-    argument_dict['alpha_cap'] = 0.8
+    argument_dict['alpha_cap'] = 0.2
     
-    argument_dict['dataset'] = 'tinyimagenet'
+    argument_dict['dataset'] = 'cifar10'
     argument_dict['mode'] = 'distillation'
     argument_dict['coef_t'] = 0
     argument_dict['coef_d'] = 1
@@ -308,7 +308,7 @@ if __name__ == '__main__':
     argument_dict['alpha_learning_rate'] = 1e-4
     argument_dict['alpha_clf_coef'] = 1
     argument_dict['alpha_l2_coef'] = 0.01
-    argument_dict['alpha_grads_div'] = 20
+    argument_dict['alpha_grads_div'] = 2
     argument_dict['alpha_wd_factor'] = 1e-5
     argument_dict['nclients_div'] = False
     argument_dict['SoTA_comp'] = False
