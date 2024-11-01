@@ -503,11 +503,9 @@ def alpha_calculation(alpha_cap,per_client_labels, per_client_output_avg_np, per
 
                 if alpha_opt:
 
-                    alpha_learning_rate, alpha_learning_iters, alpha_clf_coef, alpha_l2_coef, loss_f, m_alpha, alpha_grads_div = alpha_hyperparams
+                    alpha_learning_rate, alpha_learning_iters, alpha_clf_coef, alpha_l2_coef, alpha_grads_div = alpha_hyperparams
 
-
-
-                        # model=0
+                    # model=0
                         # optimizer=0
 
                     _, probs_sort_idxs = base_embed.sort(descending=True)
@@ -611,11 +609,10 @@ def alpha_calculation(alpha_cap,per_client_labels, per_client_output_avg_np, per
         soft_logits=base_embed
 
     if nclients_div:
-        if case_alpha=='a':
-            if inverse=='mix1' or inverse=='mix2':
-                soft_logits_np = soft_logits.detach().numpy() / n_clients
-            else:
-                soft_logits_np = soft_logits.detach().numpy() / (n_clients*alpha_cap)
+        if inverse=='mix1' or inverse=='mix2':
+            soft_logits_np = soft_logits.detach().numpy() / n_clients
+        else:
+            soft_logits_np = soft_logits.detach().numpy() / (n_clients*alpha_cap)
 
     else:
         soft_logits_np=soft_logits.detach().numpy()

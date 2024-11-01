@@ -124,6 +124,8 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
 
 
 
+
+
             per_client_output_avg, per_client_act_avg, per_client_layers_avg, per_client_grads_avg, per_client_target_avg, per_client_activation_avg, per_client_tot_output_avg, \
                 list_name, epoch,  writer, test_c_loss, test_c_prec= \
                 client_train(per_client_output_avg, per_client_act_avg, per_client_layers_avg, per_client_grads_avg, per_client_target_avg, per_client_activation_avg, per_client_tot_output_avg, client, round_n, mod, normalization,
@@ -229,12 +231,12 @@ def communication_round_train(writer, n_rounds, n_clients, n_classes, normalizat
 
                         if SoTA_comp:
 
-                            if depth == 11:
-                                model_srv_alpha = ResNet11(n_classes)
-                            else:
-                                model_srv_alpha = resnet(n_classes=n_classes, depth=depth)
+                            # if depth == 11:
+                            #     model_srv_alpha = ResNet11(n_classes)
+                            # else:
+                            model_srv_alpha = resnet(n_classes=n_classes, depth=56)
                         else:
-                            model_srv_alpha =torchvision.models.resnet50(pretrained=True, progress=True)
+                            model_srv_alpha =torchvision.models.resnet50(pretrained=False, progress=True)
 
                             model_srv_alpha.fc = torch.nn.Linear(model_srv_alpha.fc.in_features,n_classes)
 
@@ -411,12 +413,13 @@ def client_train(per_client_output_avg, per_client_act_avg, per_client_layers_av
     elif mod == 'resnet':
 
 
-
+        if depth==11:
+            model = ResNet11(n_classes)
         # if dataset=='tinyimagenet':
         #     model = torchvision.models.resnet50(pretrained=True)
         #     model.fc = nn.Linear(model.fc.in_features, n_classes)
-        # else:
-        model= resnet(n_classes=n_classes, depth=depth)
+        else:
+            model= resnet(n_classes=n_classes, depth=depth)
 
 
 
@@ -1186,10 +1189,7 @@ def test(model, test_loader, alpha_opt, SoTA_comp):
             pred = output.data.max(1, keepdim=True)[1]  # get the index of the max log-probability
             correct += pred.eq(target.data.view_as(pred)).cpu().sum()
             del output
-
-            if alpha_opt==False:
-
-                del activation
+            del activation
 
         print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2f}%)\n'.format(
             loss.item(), correct, len(test_loader.sampler),

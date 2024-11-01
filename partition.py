@@ -253,7 +253,12 @@ def random_split(n_clients, trainSet, splits, total_len, mode, list_server):
         split_tr[-1] = int(split_tr[-1] - (sum(split_tr) - total_len * 0.9))
 
     if sum(split_ev) > (total_len * 0.1):
-        split_ev[-1] = int(split_ev[-1] - (sum(split_ev) - total_len * 0.1))
+        if n_clients>50:
+            temp=sum(split_ev)
+            split_ev[-1] = int(split_ev[-1] - int(np.floor(temp - total_len * 0.1)/2))
+            split_ev[-2] = int(split_ev[-2] - int(np.ceil(temp - total_len * 0.1) / 2))
+        else:
+            split_ev[-1] = int(split_ev[-1] - (sum(split_ev) - total_len * 0.1))
     elif sum(split_ev) < (total_len * 0.1):
         split_ev[-1] = int(split_ev[-1] - (sum(split_ev) - total_len * 0.1))
 
@@ -264,6 +269,8 @@ def random_split(n_clients, trainSet, splits, total_len, mode, list_server):
     if mode == 'distillation':
 
         if list_server[0]>0:
+            print(sum(split_tr)+sum(split_ev)+sum(list_server))
+            print(len(trainSet))
 
             tot_dataset = torch.utils.data.random_split(trainSet,
                                                         split_tr + split_ev+list_server,

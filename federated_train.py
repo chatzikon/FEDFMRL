@@ -279,7 +279,7 @@ if __name__ == '__main__':
     argument_dict['batch_size'] = 64
 
     argument_dict['clients'] = 10
-     argument_dict[t_round]= 50
+    argument_dict['t_round']= 50
     argument_dict['epochs'] = 300
 
 
@@ -337,7 +337,7 @@ if __name__ == '__main__':
              argument_dict['number_of_poisoned_classes'] = number_of_poisoned_classes[i]
              argument_dict['number_of_poisoned_clients'] = number_of_poisoned_clients[k]
     
-            for j in range(iters):
+             for j in range(iters):
                 splits = create_splits(argument_dict)
                 save_path = create_save_folder(argument_dict, path_s)
     
